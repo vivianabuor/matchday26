@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matchday '26 — World Cup calendar for your phone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0E2FB0; --field-2:#0A2078; --card:#FBFAF5; --ink:#16130F;
+  --ink-soft:#5a5346; --accent:#FF4D26; --gold:#FFC02E; --green:#15B36B;
+  --line:rgba(255,255,255,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Archivo',system-ui,sans-serif; color:var(--ink);
+  background:var(--field);
+  min-height:100vh; min-height:100dvh;
+  display:flex; align-items:center; justify-content:center;
+  padding:28px 16px;
+  background:
+    radial-gradient(120% 90% at 50% -10%, #1840d6 0%, var(--field) 45%, var(--field-2) 100%);
+  overflow-x:hidden;
+}
+/* pitch markings on the field */
+.pitch{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.9}
+.pitch svg{width:100%;height:100%}
+.wrap{position:relative;z-index:1;width:100%;max-width:430px}
+
+/* ---- TICKET ---- */
+.ticket{
+  background:var(--card); border-radius:22px;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.55), 0 2px 0 rgba(255,255,255,.4) inset;
+  overflow:hidden; position:relative;
+  animation:drop .7s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes drop{from{transform:translateY(-22px) rotate(-1.2deg);opacity:0}to{transform:none;opacity:1}}
+
+.top{padding:26px 26px 18px}
+.brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.wordmark{
+  font-family:'Anton',sans-serif; font-size:24px; letter-spacing:.02em;
+  text-transform:uppercase; line-height:1; color:var(--field);
+}
+.wordmark b{color:var(--accent)}
+.tag{
+  font-family:'Space Mono',monospace; font-size:10px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase; color:#fff;
+  background:var(--accent); padding:5px 8px; border-radius:6px; white-space:nowrap;
+}
+.eyebrow{
+  font-family:'Space Mono',monospace; font-size:11px; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft);
+  margin:22px 0 10px;
+}
+h1{
+  font-family:'Anton',sans-serif; font-weight:400; text-transform:uppercase;
+  font-size:clamp(38px,11vw,50px); line-height:.92; letter-spacing:.005em;
+  color:var(--ink);
+}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{margin-top:14px;font-size:15px;line-height:1.5;color:var(--ink-soft);max-width:34ch}
+
+/* perforation */
+.perf{position:relative;height:30px}
+.perf::before{
+  content:"";position:absolute;top:50%;left:18px;right:18px;height:0;
+  border-top:2px dashed #d9d4c5;transform:translateY(-50%);
+}
+.perf::after{
+  content:"";position:absolute;left:-13px;right:-13px;top:50%;height:26px;
+  transform:translateY(-50%);pointer-events:none;
+}
+.notch{position:absolute;top:50%;width:26px;height:26px;border-radius:50%;
+  background:var(--field);transform:translateY(-50%)}
+.notch.l{left:-13px} .notch.r{right:-13px}
+
+.bottom{padding:6px 26px 28px}
+.rows{display:flex;flex-direction:column;gap:1px;border-radius:12px;overflow:hidden;
+  border:1px solid #ece7d8;margin-bottom:22px}
+.row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#fff}
+.row .k{
+  font-family:'Space Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#fff;background:var(--field);
+  width:30px;height:30px;border-radius:7px;display:grid;place-items:center;flex:none
+}
+.row .v{font-size:14px;font-weight:600;line-height:1.25}
+.row .v small{display:block;font-weight:400;font-size:12px;color:var(--ink-soft)}
+
+.buyblock{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:14px}
+.price{line-height:.85}
+.price .cur{font-family:'Anton';font-size:26px;color:var(--ink);vertical-align:top}
+.price .amt{font-family:'Anton';font-size:62px;color:var(--ink);letter-spacing:.01em}
+.price .note{display:block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
+
+.cta{
+  font-family:'Archivo',sans-serif;font-weight:800;font-size:16px;letter-spacing:.01em;
+  color:#fff;background:var(--accent);border:none;border-radius:13px;
+  padding:16px 20px;cursor:pointer;flex:1;text-align:center;
+  box-shadow:0 8px 0 #c5331a;transition:transform .08s ease,box-shadow .08s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.cta:hover{transform:translateY(-1px)}
+.cta:active{transform:translateY(4px);box-shadow:0 4px 0 #c5331a}
+.cta:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.reassure{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.04em;
+  color:var(--ink-soft);text-align:center}
+.reassure b{color:var(--green)}
+
+/* ---- STAMP (paid) ---- */
+.stamp{
+  display:none;position:absolute;top:64px;right:20px;z-index:3;
+  font-family:'Anton',sans-serif;text-transform:uppercase;color:var(--green);
+  border:4px solid var(--green);border-radius:10px;padding:6px 12px 4px;
+  font-size:26px;letter-spacing:.04em;transform:rotate(-13deg);
+  opacity:.92;mix-blend-mode:multiply;
+}
+.is-paid .stamp{display:block;animation:thunk .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes thunk{0%{transform:rotate(-13deg) scale(2.4);opacity:0}
+  60%{opacity:.92}100%{transform:rotate(-13deg) scale(1);opacity:.92}}
+
+/* success region */
+.success{display:none;padding:6px 26px 28px}
+.is-paid .success{display:block;animation:fade .5s .15s both}
+.is-paid .buyblock,.is-paid .reassure{display:none}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.dl{
+  display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  font-family:'Archivo';font-weight:800;font-size:16px;color:#fff;background:var(--green);
+  border:none;border-radius:13px;padding:16px;cursor:pointer;
+  box-shadow:0 8px 0 #0e8a51;transition:transform .08s,box-shadow .08s;text-decoration:none;
+}
+.dl:active{transform:translateY(4px);box-shadow:0 4px 0 #0e8a51}
+.dl:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.steps{margin-top:18px;border-top:1px solid #ece7d8;padding-top:16px}
+.steps h3{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.steps p{font-size:13px;line-height:1.55;color:var(--ink);margin-bottom:8px}
+.steps code{font-family:'Space Mono',monospace;font-size:11px;background:#f0ece0;
+  padding:2px 6px;border-radius:5px;word-break:break-all}
+.sub-link{margin-top:12px;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.sub-link a{color:var(--field);font-weight:700}
+
+.foot{text-align:center;margin-top:18px;font-family:'Space Mono',monospace;
+  font-size:10.5px;letter-spacing:.05em;color:rgba(255,255,255,.7);line-height:1.6}
+.foot a{color:#fff}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="pitch" aria-hidden="true">
+  <svg viewBox="0 0 430 900" preserveAspectRatio="xMidYMid slice" fill="none"
+       stroke="rgba(255,255,255,0.13)" stroke-width="2">
+    <circle cx="215" cy="450" r="90"/>
+    <line x1="0" y1="450" x2="430" y2="450"/>
+    <rect x="120" y="-40" width="190" height="120"/>
+    <rect x="120" y="820" width="190" height="120"/>
+    <circle cx="215" cy="450" r="4" fill="rgba(255,255,255,0.13)" stroke="none"/>
+  </svg>
+</div>
+
+<div class="wrap">
+  <div class="ticket" id="ticket">
+    <div class="stamp">Paid ✓</div>
+
+    <div class="top">
+      <div class="brandrow">
+        <!-- RENAME your product here -->
+        <div class="wordmark">MATCH<b>DAY</b> '26</div>
+        <span class="tag">Jun 11 – Jul 19</span>
+      </div>
+      <div class="eyebrow">104 matches · 16 cities · 1 file</div>
+      <h1>Every match.<br><em>On your phone.</em></h1>
+      <p class="sub">The full 2026 World Cup schedule, dropped straight into your calendar with kickoff reminders. Takes 20 seconds.</p>
+    </div>
+
+    <div class="perf"><span class="notch l"></span><span class="notch r"></span></div>
+
+    <div class="bottom">
+      <div class="rows">
+        <div class="row"><span class="k">104</span><span class="v">Every fixture<small>Group stage through the final</small></span></div>
+        <div class="row"><span class="k">⌚</span><span class="v">Your local time, automatically<small>No timezone math — it just works</small></span></div>
+        <div class="row"><span class="k">🔔</span><span class="v">A reminder 1 hour before kickoff<small>Never miss the first whistle</small></span></div>
+        <div class="row"><span class="k">📱</span><span class="v">iPhone &amp; Android<small>Standard calendar file, works everywhere</small></span></div>
+      </div>
+
+      <div class="buyblock">
+        <div class="price">
+          <span class="cur">$</span><span class="amt">2</span>
+          <span class="note">one-time · instant</span>
+        </div>
+        <button class="cta" id="buy">Get the calendar</button>
+      </div>
+      <p class="reassure">Secure checkout by <b>Stripe</b> · instant download</p>
+
+      <div class="success" id="success">
+        <button class="dl" id="download">⬇ Download your calendar</button>
+        <div class="steps">
+          <h3>Add it in 20 seconds</h3>
+          <p><b>iPhone:</b> tap the downloaded file → <b>Add All Events</b> → pick a calendar. Done.</p>
+          <p><b>Android:</b> open <code>calendar.google.com</code> → Settings → Import &amp; Export → choose the file → Import.</p>
+          <div class="sub-link">Want it to auto-update as knockout teams are confirmed? Subscribe to the live feed instead — <a id="subcopy" href="#">copy feed link</a>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Independent project. Not affiliated with, endorsed by, or licensed by FIFA.<br>Fixture data may change; calendar reflects the published schedule.</p>
+</div>
+
+<script>
+/* ============================================================
+   1) PASTE YOUR STRIPE PAYMENT LINK BELOW
+   2) In Stripe, set the link's success/redirect URL to:
+        https://YOUR-DOMAIN/?paid=1
+   ============================================================ */
+const STRIPE_LINK = "https://buy.stripe.com/7sYcMYaIm3dFd2Ngi59R600";
+const SUBSCRIBE_FEED = "https://ics.fixtur.es/v2/league/fifa-world-cup-2026.ics";
+
+const ICS_DATA = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//WC2026//Schedule//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:FIFA World Cup 2026\nX-WR-TIMEZONE:America/Bogota\nBEGIN:VEVENT\nUID:wc2026-001@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260611T190000Z\nDTEND:20260611T210000Z\nSUMMARY:\u26bd Mexico vs South Africa\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Mexico vs South Africa starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-002@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260612T020000Z\nDTEND:20260612T040000Z\nSUMMARY:\u26bd South Korea vs Czech Republic\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:South Korea vs Czech Republic starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-003@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260612T190000Z\nDTEND:20260612T210000Z\nSUMMARY:\u26bd Canada vs Bosnia and Herzegovina\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Canada vs Bosnia and Herzegovina starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-004@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260613T010000Z\nDTEND:20260613T030000Z\nSUMMARY:\u26bd United States vs Paraguay\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:United States vs Paraguay starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-005@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260613T190000Z\nDTEND:20260613T210000Z\nSUMMARY:\u26bd Qatar vs Switzerland\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Qatar vs Switzerland starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-006@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260613T220000Z\nDTEND:20260614T000000Z\nSUMMARY:\u26bd Brazil vs Morocco\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Brazil vs Morocco starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-007@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260614T010000Z\nDTEND:20260614T030000Z\nSUMMARY:\u26bd Haiti vs Scotland\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Haiti vs Scotland starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-008@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260614T040000Z\nDTEND:20260614T060000Z\nSUMMARY:\u26bd Australia vs T\u00fcrkiye\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Australia vs T\u00fcrkiye starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-009@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260614T170000Z\nDTEND:20260614T190000Z\nSUMMARY:\u26bd Germany vs Cura\u00e7ao\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Germany vs Cura\u00e7ao starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-010@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260614T200000Z\nDTEND:20260614T220000Z\nSUMMARY:\u26bd Netherlands vs Japan\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Netherlands vs Japan starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-011@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260614T230000Z\nDTEND:20260615T010000Z\nSUMMARY:\u26bd Ivory Coast vs Ecuador\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Ivory Coast vs Ecuador starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-012@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260615T020000Z\nDTEND:20260615T040000Z\nSUMMARY:\u26bd Sweden vs Tunisia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Sweden vs Tunisia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-013@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260615T160000Z\nDTEND:20260615T180000Z\nSUMMARY:\u26bd Spain vs Cape Verde\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Spain vs Cape Verde starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-014@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260615T190000Z\nDTEND:20260615T210000Z\nSUMMARY:\u26bd Belgium vs Egypt\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Belgium vs Egypt starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-015@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260615T220000Z\nDTEND:20260616T000000Z\nSUMMARY:\u26bd Saudi Arabia vs Uruguay\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Saudi Arabia vs Uruguay starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-016@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260616T010000Z\nDTEND:20260616T030000Z\nSUMMARY:\u26bd Iran vs New Zealand\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Iran vs New Zealand starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-017@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260616T190000Z\nDTEND:20260616T210000Z\nSUMMARY:\u26bd France vs Senegal\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:France vs Senegal starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-018@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260616T220000Z\nDTEND:20260617T000000Z\nSUMMARY:\u26bd Iraq vs Norway\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Iraq vs Norway starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-019@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260617T010000Z\nDTEND:20260617T030000Z\nSUMMARY:\u26bd Argentina vs Algeria\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Argentina vs Algeria starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-020@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260617T040000Z\nDTEND:20260617T060000Z\nSUMMARY:\u26bd Austria vs Jordan\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Austria vs Jordan starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-021@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260617T170000Z\nDTEND:20260617T190000Z\nSUMMARY:\u26bd Portugal vs DR Congo\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Portugal vs DR Congo starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-022@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260617T200000Z\nDTEND:20260617T220000Z\nSUMMARY:\u26bd England vs Croatia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:England vs Croatia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-023@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260617T230000Z\nDTEND:20260618T010000Z\nSUMMARY:\u26bd Ghana vs Panama\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Ghana vs Panama starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-024@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260618T020000Z\nDTEND:20260618T040000Z\nSUMMARY:\ud83c\udde8\ud83c\uddf4 Uzbekistan vs Colombia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Uzbekistan vs Colombia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-025@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260618T160000Z\nDTEND:20260618T180000Z\nSUMMARY:\u26bd Czech Republic vs South Africa\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Czech Republic vs South Africa starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-026@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260618T190000Z\nDTEND:20260618T210000Z\nSUMMARY:\u26bd Switzerland vs Bosnia and Herzegovina\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Switzerland vs Bosnia and Herzegovina starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-027@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260618T220000Z\nDTEND:20260619T000000Z\nSUMMARY:\u26bd Canada vs Qatar\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Canada vs Qatar starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-028@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260619T010000Z\nDTEND:20260619T030000Z\nSUMMARY:\u26bd Mexico vs South Korea\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Mexico vs South Korea starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-029@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260619T190000Z\nDTEND:20260619T210000Z\nSUMMARY:\u26bd United States vs Australia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:United States vs Australia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-030@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260619T220000Z\nDTEND:20260620T000000Z\nSUMMARY:\u26bd Scotland vs Morocco\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Scotland vs Morocco starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-031@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260620T003000Z\nDTEND:20260620T023000Z\nSUMMARY:\u26bd Brazil vs Haiti\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Brazil vs Haiti starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-032@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260620T030000Z\nDTEND:20260620T050000Z\nSUMMARY:\u26bd T\u00fcrkiye vs Paraguay\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:T\u00fcrkiye vs Paraguay starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-033@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260620T170000Z\nDTEND:20260620T190000Z\nSUMMARY:\u26bd Netherlands vs Sweden\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Netherlands vs Sweden starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-034@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260620T200000Z\nDTEND:20260620T220000Z\nSUMMARY:\u26bd Germany vs Ivory Coast\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Germany vs Ivory Coast starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-035@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260621T000000Z\nDTEND:20260621T020000Z\nSUMMARY:\u26bd Ecuador vs Cura\u00e7ao\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Ecuador vs Cura\u00e7ao starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-036@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260621T040000Z\nDTEND:20260621T060000Z\nSUMMARY:\u26bd Tunisia vs Japan\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Tunisia vs Japan starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-037@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260621T160000Z\nDTEND:20260621T180000Z\nSUMMARY:\u26bd Spain vs Saudi Arabia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Spain vs Saudi Arabia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-038@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260621T190000Z\nDTEND:20260621T210000Z\nSUMMARY:\u26bd Belgium vs Iran\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Belgium vs Iran starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-039@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260621T220000Z\nDTEND:20260622T000000Z\nSUMMARY:\u26bd Uruguay vs Cape Verde\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Uruguay vs Cape Verde starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-040@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260622T010000Z\nDTEND:20260622T030000Z\nSUMMARY:\u26bd New Zealand vs Egypt\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:New Zealand vs Egypt starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-041@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260622T170000Z\nDTEND:20260622T190000Z\nSUMMARY:\u26bd Argentina vs Austria\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Argentina vs Austria starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-042@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260622T210000Z\nDTEND:20260622T230000Z\nSUMMARY:\u26bd France vs Iraq\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:France vs Iraq starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-043@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260623T000000Z\nDTEND:20260623T020000Z\nSUMMARY:\u26bd Norway vs Senegal\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Norway vs Senegal starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-044@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260623T030000Z\nDTEND:20260623T050000Z\nSUMMARY:\u26bd Jordan vs Algeria\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Jordan vs Algeria starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-045@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260623T170000Z\nDTEND:20260623T190000Z\nSUMMARY:\u26bd Portugal vs Uzbekistan\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Portugal vs Uzbekistan starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-046@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260623T200000Z\nDTEND:20260623T220000Z\nSUMMARY:\u26bd England vs Ghana\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:England vs Ghana starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-047@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260623T230000Z\nDTEND:20260624T010000Z\nSUMMARY:\u26bd Panama vs Croatia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Panama vs Croatia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-048@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260624T020000Z\nDTEND:20260624T040000Z\nSUMMARY:\ud83c\udde8\ud83c\uddf4 Colombia vs DR Congo\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Colombia vs DR Congo starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-049@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260624T190000Z\nDTEND:20260624T210000Z\nSUMMARY:\u26bd Switzerland vs Canada\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Switzerland vs Canada starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-050@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260624T190000Z\nDTEND:20260624T210000Z\nSUMMARY:\u26bd Bosnia and Herzegovina vs Qatar\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Bosnia and Herzegovina vs Qatar starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-051@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260624T220000Z\nDTEND:20260625T000000Z\nSUMMARY:\u26bd Morocco vs Haiti\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Morocco vs Haiti starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-052@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260624T220000Z\nDTEND:20260625T000000Z\nSUMMARY:\u26bd Scotland vs Brazil\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Scotland vs Brazil starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-053@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260625T010000Z\nDTEND:20260625T030000Z\nSUMMARY:\u26bd South Africa vs South Korea\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:South Africa vs South Korea starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-054@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260625T010000Z\nDTEND:20260625T030000Z\nSUMMARY:\u26bd Czech Republic vs Mexico\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Czech Republic vs Mexico starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-055@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260625T200000Z\nDTEND:20260625T220000Z\nSUMMARY:\u26bd Cura\u00e7ao vs Ivory Coast\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Cura\u00e7ao vs Ivory Coast starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-056@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260625T200000Z\nDTEND:20260625T220000Z\nSUMMARY:\u26bd Ecuador vs Germany\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Ecuador vs Germany starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-057@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260625T230000Z\nDTEND:20260626T010000Z\nSUMMARY:\u26bd Japan vs Sweden\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Japan vs Sweden starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-058@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260625T230000Z\nDTEND:20260626T010000Z\nSUMMARY:\u26bd Tunisia vs Netherlands\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Tunisia vs Netherlands starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-059@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260626T020000Z\nDTEND:20260626T040000Z\nSUMMARY:\u26bd Paraguay vs Australia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Paraguay vs Australia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-060@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260626T020000Z\nDTEND:20260626T040000Z\nSUMMARY:\u26bd T\u00fcrkiye vs United States\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:T\u00fcrkiye vs United States starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-061@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260626T190000Z\nDTEND:20260626T210000Z\nSUMMARY:\u26bd Norway vs France\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Norway vs France starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-062@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260626T190000Z\nDTEND:20260626T210000Z\nSUMMARY:\u26bd Senegal vs Iraq\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Senegal vs Iraq starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-063@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T000000Z\nDTEND:20260627T020000Z\nSUMMARY:\u26bd Cape Verde vs Saudi Arabia\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Cape Verde vs Saudi Arabia starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-064@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T000000Z\nDTEND:20260627T020000Z\nSUMMARY:\u26bd Uruguay vs Spain\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Uruguay vs Spain starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-065@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T030000Z\nDTEND:20260627T050000Z\nSUMMARY:\u26bd Egypt vs Iran\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Egypt vs Iran starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-066@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T030000Z\nDTEND:20260627T050000Z\nSUMMARY:\u26bd New Zealand vs Belgium\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:New Zealand vs Belgium starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-067@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T210000Z\nDTEND:20260627T230000Z\nSUMMARY:\u26bd Croatia vs Ghana\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Croatia vs Ghana starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-068@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T210000Z\nDTEND:20260627T230000Z\nSUMMARY:\u26bd Panama vs England\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Panama vs England starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-069@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T233000Z\nDTEND:20260628T013000Z\nSUMMARY:\ud83c\udde8\ud83c\uddf4 Colombia vs Portugal\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Colombia vs Portugal starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-070@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260627T233000Z\nDTEND:20260628T013000Z\nSUMMARY:\u26bd DR Congo vs Uzbekistan\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:DR Congo vs Uzbekistan starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-071@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260628T020000Z\nDTEND:20260628T040000Z\nSUMMARY:\u26bd Algeria vs Austria\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Algeria vs Austria starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-072@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260628T020000Z\nDTEND:20260628T040000Z\nSUMMARY:\u26bd Jordan vs Argentina\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Jordan vs Argentina starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-073@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260628T190000Z\nDTEND:20260628T210000Z\nSUMMARY:\u26bd 2A vs 2B (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:2A vs 2B (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-074@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260629T170000Z\nDTEND:20260629T190000Z\nSUMMARY:\u26bd 1C vs 2F (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1C vs 2F (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-075@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260629T203000Z\nDTEND:20260629T223000Z\nSUMMARY:\u26bd 1E vs 3rd A/B/C/D/F (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1E vs 3rd A/B/C/D/F (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-076@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260630T010000Z\nDTEND:20260630T030000Z\nSUMMARY:\u26bd 1F vs 2C (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1F vs 2C (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-077@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260630T170000Z\nDTEND:20260630T190000Z\nSUMMARY:\u26bd 2E vs 2I (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:2E vs 2I (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-078@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260630T210000Z\nDTEND:20260630T230000Z\nSUMMARY:\u26bd 1I vs 3rd C/D/F/G/H (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1I vs 3rd C/D/F/G/H (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-079@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260701T010000Z\nDTEND:20260701T030000Z\nSUMMARY:\u26bd 1A vs 3rd C/E/F/H/I (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1A vs 3rd C/E/F/H/I (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-080@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260701T160000Z\nDTEND:20260701T180000Z\nSUMMARY:\u26bd 1L vs 3rd E/H/I/J/K (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1L vs 3rd E/H/I/J/K (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-081@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260701T200000Z\nDTEND:20260701T220000Z\nSUMMARY:\u26bd 1G vs 3rd A/E/H/I/J (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1G vs 3rd A/E/H/I/J (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-082@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260702T000000Z\nDTEND:20260702T020000Z\nSUMMARY:\u26bd 1D vs 3rd B/E/F/I/J (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1D vs 3rd B/E/F/I/J (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-083@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260702T190000Z\nDTEND:20260702T210000Z\nSUMMARY:\u26bd 1H vs 2J (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1H vs 2J (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-084@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260702T230000Z\nDTEND:20260703T010000Z\nSUMMARY:\u26bd 2K vs 2L (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:2K vs 2L (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-085@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260703T030000Z\nDTEND:20260703T050000Z\nSUMMARY:\u26bd 1B vs 3rd E/F/G/I/J (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1B vs 3rd E/F/G/I/J (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-086@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260703T180000Z\nDTEND:20260703T200000Z\nSUMMARY:\u26bd 2D vs 2G (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:2D vs 2G (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-087@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260703T220000Z\nDTEND:20260704T000000Z\nSUMMARY:\u26bd 1J vs 2H (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1J vs 2H (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-088@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260704T013000Z\nDTEND:20260704T033000Z\nSUMMARY:\u26bd 1K vs 3rd D/E/I/J/L (Round of 32)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:1K vs 3rd D/E/I/J/L (Round of 32) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-089@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260704T170000Z\nDTEND:20260704T190000Z\nSUMMARY:\u26bd W1 vs W3 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W1 vs W3 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-090@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260704T210000Z\nDTEND:20260704T230000Z\nSUMMARY:\u26bd W2 vs W5 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W2 vs W5 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-091@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260705T200000Z\nDTEND:20260705T220000Z\nSUMMARY:\u26bd W4 vs W6 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W4 vs W6 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-092@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260706T000000Z\nDTEND:20260706T020000Z\nSUMMARY:\u26bd W7 vs W8 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W7 vs W8 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-093@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260706T190000Z\nDTEND:20260706T210000Z\nSUMMARY:\u26bd W11 vs W12 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W11 vs W12 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-094@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260707T000000Z\nDTEND:20260707T020000Z\nSUMMARY:\u26bd W9 vs W10 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W9 vs W10 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-095@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260707T160000Z\nDTEND:20260707T180000Z\nSUMMARY:\u26bd W14 vs W16 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W14 vs W16 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-096@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260707T200000Z\nDTEND:20260707T220000Z\nSUMMARY:\u26bd W13 vs W15 (Round of 16)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W13 vs W15 (Round of 16) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-097@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260709T200000Z\nDTEND:20260709T220000Z\nSUMMARY:\u26bd W1 vs W2 (Quarter-final)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W1 vs W2 (Quarter-final) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-098@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260710T190000Z\nDTEND:20260710T210000Z\nSUMMARY:\u26bd W5 vs W6 (Quarter-final)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W5 vs W6 (Quarter-final) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-099@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260711T210000Z\nDTEND:20260711T230000Z\nSUMMARY:\u26bd W3 vs W4 (Quarter-final)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W3 vs W4 (Quarter-final) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-100@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260712T010000Z\nDTEND:20260712T030000Z\nSUMMARY:\u26bd W7 vs W8 (Quarter-final)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W7 vs W8 (Quarter-final) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-101@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260714T190000Z\nDTEND:20260714T210000Z\nSUMMARY:\u26bd W1 vs W2 (Semi-final)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W1 vs W2 (Semi-final) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-102@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260715T190000Z\nDTEND:20260715T210000Z\nSUMMARY:\u26bd W3 vs W4 (Semi-final)\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:W3 vs W4 (Semi-final) starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-103@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260718T210000Z\nDTEND:20260718T230000Z\nSUMMARY:\u26bd Third-place play-off\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Third-place play-off starts in 1 hour\nEND:VALARM\nEND:VEVENT\nBEGIN:VEVENT\nUID:wc2026-104@fixtures.local\nDTSTAMP:20260611T214554Z\nDTSTART:20260719T190000Z\nDTEND:20260719T210000Z\nSUMMARY:\u26bd Final\nDESCRIPTION:FIFA World Cup 2026\nBEGIN:VALARM\nTRIGGER:-PT60M\nACTION:DISPLAY\nDESCRIPTION:Final starts in 1 hour\nEND:VALARM\nEND:VEVENT\nEND:VCALENDAR\n";
+
+const params = new URLSearchParams(location.search);
+const isPaid = params.get("paid") === "1" || params.get("success") === "true";
+
+const buy = document.getElementById("buy");
+buy.addEventListener("click", () => {
+  if (STRIPE_LINK.includes("REPLACE_WITH_YOUR_LINK")) {
+    alert("Add your Stripe Payment Link in the page source (STRIPE_LINK) to enable checkout.");
+    return;
+  }
+  window.location.href = STRIPE_LINK;
+});
+
+function triggerDownload(){
+  const blob = new Blob([ICS_DATA], {type:"text/calendar;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "world-cup-2026.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
+}
+
+document.getElementById("download").addEventListener("click", triggerDownload);
+document.getElementById("subcopy").addEventListener("click", (e)=>{
+  e.preventDefault();
+  navigator.clipboard?.writeText(SUBSCRIBE_FEED);
+  e.target.textContent = "feed link copied ✓";
+});
+
+if (isPaid){
+  document.getElementById("ticket").classList.add("is-paid");
+  // auto-start the download a beat after the stamp lands
+  setTimeout(triggerDownload, 900);
+}
+</script>
+</body>
+</html>
